@@ -853,11 +853,13 @@ public class Notes extends Global {
 						Iterator<DefaultMutableTreeNode> foldersNodesRenderedInTreeIt = foldersNodesRenderedInTree.iterator();
 						while ( foldersNodesRenderedInTreeIt.hasNext() ) {
 							DefaultMutableTreeNode folderNodeFound = foldersNodesRenderedInTreeIt.next();
-							Path folderNodeFoundPath = getNodePath( folderNodeFound );
-							if ( folderNodeFoundPath != null ) {
-								if ( folderNodeFoundPath.toString().equals(nodePathStr) == true ) {
-									folderNode = folderNodeFound;
-									break;
+							if ( folderNodeFound != null ) {
+								Path folderNodeFoundPath = getNodePath( folderNodeFound );
+								if ( folderNodeFoundPath != null ) {
+									if ( folderNodeFoundPath.toString().equals(nodePathStr) == true ) {
+										folderNode = folderNodeFound;
+										break;
+									}
 								}
 							}
 						}
@@ -1980,7 +1982,8 @@ public class Notes extends Global {
 				pane.addKeyListener( new KeyListener() {
 					@Override
 					public void keyTyped(KeyEvent e) {
-						setNoteOpenedIsSaved( argsNewNoteOpenedIsSaved );
+						if ( e.isControlDown() == false )
+							setNoteOpenedIsSaved( argsNewNoteOpenedIsSaved );
 					}
 
 					@Override
@@ -2018,7 +2021,9 @@ public class Notes extends Global {
 						} else if ( Objects.equals(keyCode, KeyEvent.VK_F) && e.isControlDown() == true ) {
 							panelSearchInNote.setVisible( true );
 							inputSearchInNote.requestFocus();
-						}
+						} else if ( e.isControlDown() == true && Objects.equals(keyCode, KeyEvent.VK_Z) 
+						|| e.isControlDown() == true && Objects.equals(keyCode, KeyEvent.VK_Y) )
+							setNoteOpenedIsSaved( argsNewNoteOpenedIsSaved );
 					}
 
 					@Override
@@ -2878,8 +2883,10 @@ public class Notes extends Global {
 					Iterator<DefaultMutableTreeNode> foldersNodesRenderedInTreeIt = foldersNodesRenderedInTree.iterator();
 					while ( foldersNodesRenderedInTreeIt.hasNext() ) {
 						DefaultMutableTreeNode folderNodeFound = foldersNodesRenderedInTreeIt.next();
-						if ( isNodeVisible(folderNodeFound) == false )
-							foldersNodesToRemove.add( folderNodeFound );
+						if ( folderNodeFound != null ) {
+							if ( isNodeVisible(folderNodeFound) == false )
+								foldersNodesToRemove.add( folderNodeFound );
+						}
 					}
 					
 					Iterator<DefaultMutableTreeNode> foldersNodesToRemoveIt = foldersNodesToRemove.iterator();
@@ -2893,12 +2900,14 @@ public class Notes extends Global {
 					Iterator<Note> notesRenderedInTreeIt = notesRenderedInTree.iterator();
 					while ( notesRenderedInTreeIt.hasNext() ) {
 						Note noteFound = notesRenderedInTreeIt.next();
-						DefaultMutableTreeNode nodeFound = getNode( noteFound );
-						if ( nodeFound != null ) {
-							isNodeVisible( nodeFound );
-							
-							if ( isNodeVisible(nodeFound) == false ) {
-								notesToRemove.add( noteFound );
+						if ( noteFound != null ) {
+							DefaultMutableTreeNode nodeFound = getNode( noteFound );
+							if ( nodeFound != null ) {
+								isNodeVisible( nodeFound );
+
+								if ( isNodeVisible(nodeFound) == false ) {
+									notesToRemove.add( noteFound );
+								}
 							}
 						}
 					}

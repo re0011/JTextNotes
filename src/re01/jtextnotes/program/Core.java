@@ -19,13 +19,7 @@
 
 package re01.jtextnotes.program;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
-import java.util.Scanner;
-import java.util.logging.Level;
-import re01.exception.Re01JLibException;
 import re01.io.system.Files;
 import re01.tool.helper.debug.Logger;
 
@@ -39,7 +33,7 @@ public class Core {
 	private static final String WEBSITE = "http://www.re01.website/";
 	
 	private static final String PROGRAM_NAME = "JTextNotes";
-	private static final String PROGRAM_VERSION = "20200623";
+	private static final String PROGRAM_VERSION = "20200724";
 	private static final String PROGRAM_VERSION_STATE = "Beta";
 	private static final String PROGRAM_LICENSE_NAME = "GNU GENERAL PUBLIC LICENSE";
 	private static final String PROGRAM_COPYRIGHT = "Copyright (C) 2020";
