@@ -34,6 +34,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import re01.design.color.Color;
@@ -979,7 +981,7 @@ public class Notes extends Global {
 				if ( subFile.isDirectory() ) {
 					folder.getFolders().add(createFolderRoot(null, folder, subFile) );
 				} else if ( subFile.getPath().endsWith(Core.get_NOTE_FILE_EXTENSION()) ) {
-					String fileContent = files.getContent( subFile );
+					String fileContent = files.getContent( subFile, StandardCharsets.UTF_8 );
 					if ( fileContent != null ) {
 						String header = noteReader.getHeaderContent( fileContent, true );
 						if ( header != null ) {
@@ -1367,7 +1369,7 @@ public class Notes extends Global {
 				Note folderNote = folderNotesIt.next();
 
 				String pathNoteStr = Paths.get( folderNew.getPathAbsolute(true), folderNote.getName() ).toString();
-				if ( files.writeContent(pathNoteStr, folderNote.getContent()) == true ) {
+				if ( files.writeContent(pathNoteStr, folderNote.getContent(), StandardCharsets.UTF_8 ) == true ) {
 					Note noteNew = new Note( 
 						folderNew, 
 						folderNote.getName(), 
@@ -1659,7 +1661,7 @@ public class Notes extends Global {
 		content += noteReader.createBodyContent( null );
 		
 		String pathStr = Paths.get( folder.getPathAbsolute(true), name ).toString();
-		if ( files.writeContent(pathStr, content) == true ) {
+		if ( files.writeContent(pathStr, content, StandardCharsets.UTF_8) == true ) {
 			folder.getNotes().add( new Note( 
 				folder, 
 				name, 
@@ -2536,15 +2538,15 @@ public class Notes extends Global {
 		if ( nodePath.toString().equals(pathStr) )
 			result = node;
 		
-		Enumeration<Object> nodeChildrenIt = node.children();
+		Enumeration<TreeNode> nodeChildrenIt = node.children();
 		while ( nodeChildrenIt.hasMoreElements() && result == null ) {
-			Object nodeFoundObj = nodeChildrenIt.nextElement();
-			DefaultMutableTreeNode nodeFound = ( DefaultMutableTreeNode ) nodeFoundObj;
+			TreeNode treeNodeFound = nodeChildrenIt.nextElement();
+			DefaultMutableTreeNode nodeFound = ( DefaultMutableTreeNode ) treeNodeFound;
 			
-			Enumeration<Object> nodeFoundChildrenIt = nodeFound.children();
+			Enumeration<TreeNode> nodeFoundChildrenIt = nodeFound.children();
 			while ( nodeFoundChildrenIt.hasMoreElements() && result == null ) {
-				Object subNodeFoundObj = nodeFoundChildrenIt.nextElement();
-				DefaultMutableTreeNode subNodeFound = ( DefaultMutableTreeNode ) subNodeFoundObj;
+				TreeNode subTreeNodeFound = nodeFoundChildrenIt.nextElement();
+				DefaultMutableTreeNode subNodeFound = ( DefaultMutableTreeNode ) subTreeNodeFound;
 				result = getNode( subNodeFound, pathStr );
 			}
 			
@@ -3317,7 +3319,7 @@ public class Notes extends Global {
 	private boolean saveNote( Note note ) {
 		boolean isSaved = false;
 		try {
-			if ( files.writeContent(note.getPathAbsolute(), note.getContent()) == true ) {
+			if ( files.writeContent(note.getPathAbsolute(), note.getContent(), StandardCharsets.UTF_8) == true ) {
 				isSaved = true;
 				note.setIsSaved( true );
 			}
@@ -3486,7 +3488,7 @@ public class Notes extends Global {
 									notesRenamedQty++;
 
 								String pathStr = Paths.get( folderSelected.getPathAbsolute(true), nameNew ).toString();
-								if ( files.writeContent(pathStr, noteSelected.getContent()) == true ) {
+								if ( files.writeContent(pathStr, noteSelected.getContent(), StandardCharsets.UTF_8) == true ) {
 									folderSelectedNotes.add( new Note( 
 										folderSelected, 
 										nameNew, 
