@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 LE CLERRE Renaud
+ * Copyright (C) 2020-2021 LE CLERRE Renaud
  *
  * This file is part of JTextNotes.
  *
