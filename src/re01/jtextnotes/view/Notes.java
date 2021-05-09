@@ -89,11 +89,11 @@ import re01.design.view.swing.JTextField;
 import re01.design.view.swing.JTree;
 import re01.design.view.swing.jcombobox.JComboBoxTypeEnum;
 import re01.design.view.swing.jtree.DefaultMutableTreeNode;
+import re01.environment.Parameters;
 import re01.exception.Re01JLibException;
 import re01.io.system.Files;
 import re01.io.serialize.ParametersSerializer;
 import re01.object.Tuple;
-import re01.environment.Parameters;
 import re01.tool.helper.system.DesktopHelper;
 import re01.tool.helper.system.MethodHelper;
 import re01.tool.helper.system.StringHelper;
@@ -111,6 +111,7 @@ import re01.jtextnotes.design.view.swing.JTextPane;
 import re01.jtextnotes.system.JTextNotes;
 import re01.jtextnotes.program.Core;
 import re01.jtextnotes.user.ParametersApplicator;
+import re01.tool.helper.system.KeyboardHelper;
 
 /**
  *
@@ -150,6 +151,7 @@ public class Notes extends Global {
 	
 	private JMenuBar messagesBar = null;
 	private JPanel subMessagesBar = null;
+	private Boolean isMessagesBarReseted = true;
 	private ArrayList<String> messagesBarOkMessages = new ArrayList<>();
 	private ArrayList<String> messagesBarInfoMessages = new ArrayList<>();
 	private ArrayList<String> messagesBarErrorMessages = new ArrayList<>();
@@ -1168,6 +1170,18 @@ public class Notes extends Global {
 		messagesBarErrorMessages.clear();
 		SwingUtilities.updateComponentTreeUI( messagesBar );
 		this.remove( messagesBar );
+		isMessagesBarReseted = true;
+	}
+	
+	private void resetMessagesBarAsync() {
+		if ( isMessagesBarReseted == false ) {
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					resetMessagesBar();
+				}
+			} );
+		}
 	}
 	
 	private void addMessagesBarOk( String message ) {
@@ -1178,6 +1192,7 @@ public class Notes extends Global {
 		JLabel label = new JLabel( message );
 		label.setIcon( images.get_GLOBAL_IMAGE_ICON_OK() );
 		subMessagesBar.add( label );
+		isMessagesBarReseted = false;
 
 		messagesBarOkMessages.add( message );
 	}
@@ -1190,6 +1205,7 @@ public class Notes extends Global {
 		JLabel label = new JLabel( message );
 		label.setIcon( images.get_GLOBAL_IMAGE_ICON_INFO() );
 		subMessagesBar.add( label );
+		isMessagesBarReseted = false;
 
 		messagesBarInfoMessages.add( message );
 	}
@@ -1202,6 +1218,7 @@ public class Notes extends Global {
 		JLabel label = new JLabel( message );
 		label.setIcon( images.get_GLOBAL_IMAGE_ICON_ERROR() );
 		subMessagesBar.add( label );
+		isMessagesBarReseted = false;
 
 		messagesBarErrorMessages.add( message );
 	}
@@ -1982,6 +1999,8 @@ public class Notes extends Global {
 				noteOpened.setPane( pane );
 				
 				pane.addKeyListener( new KeyListener() {
+					KeyboardHelper keyboardHelper = new KeyboardHelper();
+					
 					@Override
 					public void keyTyped(KeyEvent e) {
 						if ( e.isControlDown() == false )
@@ -2031,6 +2050,8 @@ public class Notes extends Global {
 					@Override
 					public void keyReleased(KeyEvent e) {
 						pane.setSelectionStartIndex( pane.getSelectionStart() );
+						if ( keyboardHelper.isKeyCodeNonCharKey(e.getKeyCode()) == false )
+							resetMessagesBarAsync();
 					}
 				} );
 

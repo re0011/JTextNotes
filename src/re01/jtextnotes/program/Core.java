@@ -33,10 +33,10 @@ public class Core {
 	private static final String WEBSITE = "http://www.re01.website/";
 	
 	private static final String PROGRAM_NAME = "JTextNotes";
-	private static final String PROGRAM_VERSION = "20201108";
+	private static final String PROGRAM_VERSION = "20210508";
 	private static final String PROGRAM_VERSION_STATE = "Beta";
 	private static final String PROGRAM_LICENSE_NAME = "GNU GENERAL PUBLIC LICENSE";
-	private static final String PROGRAM_COPYRIGHT = "Copyright (C) 2020";
+	private static final String PROGRAM_COPYRIGHT = "Copyright (C) 2020-2021";
 	private static final String PROGRAM_ICON_PATH = "images/program_icon.png";
 	
 	private static final String NOTE_FILE_EXTENSION = ".txt";
