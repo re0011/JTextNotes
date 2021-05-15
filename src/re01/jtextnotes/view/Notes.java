@@ -238,7 +238,7 @@ public class Notes extends Global {
 							}
 						} else {
 							THIS.delete();
-							JTextNotes.getViewNotes().remove( (Notes)THIS );
+							JTextNotes.getViewsNotes().remove( (Notes)THIS );
 						}
 						
 						if ( viewLoading1 != null )
@@ -350,8 +350,8 @@ public class Notes extends Global {
 							}
 						} else {
 							THIS.delete();
-							JTextNotes.getViewNotes().remove( (Notes)THIS );
-							if ( Objects.equals(JTextNotes.getViewNotes().size(), 0) == true )
+							JTextNotes.getViewsNotes().remove( (Notes)THIS );
+							if ( Objects.equals(JTextNotes.getViewsNotes().size(), 0) == true )
 								JTextNotes.createViewWorkDirectory( null );
 						}
 						
@@ -1117,11 +1117,11 @@ public class Notes extends Global {
 			boolean isExit = MethodHelper.getArgBoolean(Confirm.get_ARG_KEY_CONFIRM_RESULT(), args );
 			if ( isExit == true ) {
 				THIS.delete();
-				JTextNotes.getViewNotes().remove( (Notes)THIS );
+				JTextNotes.getViewsNotes().remove( (Notes)THIS );
 				
 				Boolean askForWorkDirectoryIfClose = MethodHelper.getArgBoolean( ARG_KEY_ASK_FOR_WORK_DIRECTORY_IF_CLOSE, args );
 				if ( askForWorkDirectoryIfClose != null && askForWorkDirectoryIfClose == true ) {
-					if ( Objects.equals(JTextNotes.getViewNotes().size(), 0) == true )
+					if ( Objects.equals(JTextNotes.getViewsNotes().size(), 0) == true )
 						JTextNotes.createViewWorkDirectory( null );
 				}
 			} else
@@ -2174,7 +2174,6 @@ public class Notes extends Global {
 								setNoteHeaderParameter( parameterReader.get_PARAMETER_HEADER_ICON_VALUE(), iconType.toString() );
 								noteOpened.setIconType( NoteIconTypeEnum.G2dImg );
 								noteOpened.setIconValue( iconType.toString() );
-								
 								noteOpened.setIcon( images.getImage(iconType) );
 							}
 						}
@@ -3104,6 +3103,20 @@ public class Notes extends Global {
 	//====================
 	
 	//====================
+	// region close
+	//====================
+	
+	public void closeNoteOpened() {
+		noteOpened = null;
+		nodeOpened = null;
+		refreshTreeAsync();
+	}
+	
+	//====================
+	// endregion close
+	//====================
+	
+	//====================
 	// region save
 	//====================
 	
@@ -3993,6 +4006,26 @@ public class Notes extends Global {
 	private void deleteContent() {
 		panelNoteContent.removeAll();
 		SwingUtilities.updateComponentTreeUI( panelNoteContent );
+	}
+	
+	public void deleteNotesPanes() {
+		deleteNotesPanes( folderRoot );
+	}
+	
+	private void deleteNotesPanes( Folder folder ) {
+		Iterator<Folder> folderFoldersIt = folder.getFolders().iterator();
+		while ( folderFoldersIt.hasNext() ) {
+			Folder folderFolder = folderFoldersIt.next();
+			deleteNotesPanes(folderFolder);
+		}
+		
+		Iterator<Note> folderNotesIt = folder.getNotes().iterator();
+		while ( folderNotesIt.hasNext() ) {
+			Note folderNote = folderNotesIt.next();
+			folderNote.setPane(null);
+			if ( folderNote.equals(noteOpened) )
+				deleteContent();
+		}
 	}
 	
 	//====================

@@ -187,6 +187,8 @@ public abstract class Global {
 	protected String WORK_DIRECTORY_CLOSE;
 	protected String WORK_DIRECTORY_PART_OPENED;
 	
+	protected String TEXT_CAN_NOT_APPLY_PARAMETERS_CHANGES_UNTIL_SAVE_NOTES;
+	
 	//=====================
 	// Languages
 	
@@ -924,6 +926,10 @@ public abstract class Global {
 
 	public String get_WORK_DIRECTORY_PART_OPENED() {
 		return WORK_DIRECTORY_PART_OPENED;
+	}
+
+	public String get_TEXT_CAN_NOT_APPLY_PARAMETERS_CHANGES_UNTIL_SAVE_NOTES() {
+		return TEXT_CAN_NOT_APPLY_PARAMETERS_CHANGES_UNTIL_SAVE_NOTES;
 	}
 	
 	//=====================

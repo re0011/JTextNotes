@@ -33,7 +33,7 @@ public class Core {
 	private static final String WEBSITE = "http://www.re01.website/";
 	
 	private static final String PROGRAM_NAME = "JTextNotes";
-	private static final String PROGRAM_VERSION = "20210509";
+	private static final String PROGRAM_VERSION = "20210514";
 	private static final String PROGRAM_VERSION_STATE = "Beta";
 	private static final String PROGRAM_LICENSE_NAME = "GNU GENERAL PUBLIC LICENSE";
 	private static final String PROGRAM_COPYRIGHT = "Copyright (C) 2020-2021";

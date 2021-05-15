@@ -206,6 +206,8 @@ public class English extends Global {
 		WORK_DIRECTORY_CLOSE = "Close " + WORK_DIRECTORY.toLowerCase();
 		WORK_DIRECTORY_PART_OPENED = "An opened work directory contains some parts of the work directory that you try to open";
 		
+		TEXT_CAN_NOT_APPLY_PARAMETERS_CHANGES_UNTIL_SAVE_NOTES = "Parameters can not change until every notes are not saved.";
+		
 		//=====================
 		// Languages
 		

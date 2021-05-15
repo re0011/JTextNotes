@@ -59,7 +59,7 @@ import re01.jtextnotes.view.Welcome;
  */
 public class JTextNotes {
 
-	private static HashSet<Notes> viewNotes = new HashSet<Notes>();
+	private static HashSet<Notes> viewsNotes = new HashSet<Notes>();
 	private static re01.jtextnotes.view.SelectLanguage viewSelectLanguage = null;
 	private static re01.jtextnotes.view.Parameters viewParameters = null;
 	
@@ -121,12 +121,12 @@ public class JTextNotes {
 		} );
 	}
 
-	public static HashSet<Notes> getViewNotes() {
-		return viewNotes;
+	public static HashSet<Notes> getViewsNotes() {
+		return viewsNotes;
 	}
 
-	public static void setViewNotes(HashSet<Notes> viewNotes) {
-		JTextNotes.viewNotes = viewNotes;
+	public static void setViewsNotes(HashSet<Notes> viewsNotes) {
+		JTextNotes.viewsNotes = viewsNotes;
 	}
 
 	public static SelectLanguage getViewSelectLanguage() {
@@ -326,7 +326,7 @@ public class JTextNotes {
 				re01.jtextnotes.user.Parameters.setIsViewWelcomeDoNotDisplayAgain( isViewWelcomeDoNotDisplayAgain );
 			
 			if ( workDirectoryPath != null ) {
-				createViewNotes( args );
+				createViewsNotes( args );
 			} else if ( re01.jtextnotes.user.Parameters.getIsWorkDirectoryLastAutoSelect() != null && re01.jtextnotes.user.Parameters.getIsWorkDirectoryLastAutoSelect() == true && re01.jtextnotes.user.Parameters.getWorkDirectoryLastPath() != null ) {
 				try {
 					MethodHelper.addOrReplaceCallbackArg(WorkDirectory.get_ARG_KEY_WORK_DIRECTORY_PATH(), re01.jtextnotes.user.Parameters.getWorkDirectoryLastPath(), args );
@@ -334,7 +334,7 @@ public class JTextNotes {
 					Core.get_LOGGER().write( ex );
 				}
 
-				createViewNotes( args );
+				createViewsNotes( args );
 			} else if ( re01.jtextnotes.user.Parameters.getWorkDirectoryLastPath() != null ) {
 				try {
 					MethodHelper.addOrReplaceCallbackArg(WorkDirectoryLast.get_ARG_KEY_WORK_DIRECTORY_LAST_PATH(), re01.jtextnotes.user.Parameters.getWorkDirectoryLastPath(), args );
@@ -383,7 +383,7 @@ public class JTextNotes {
 		}
 	}
 	
-	public static void createViewNotes( Object[] args ) {
+	public static void createViewsNotes( Object[] args ) {
 		Thread thread = new Thread(new Runnable(){
 			@Override
 			public void run() {
@@ -417,9 +417,9 @@ public class JTextNotes {
 							viewLoading1.resume();
 
 							boolean isWorkDirectoryPartOpened = false;
-							Iterator<Notes> viewNotesIt = viewNotes.iterator();
-							while ( viewNotesIt.hasNext() ) {
-								Notes viewNotesFound = viewNotesIt.next();
+							Iterator<Notes> viewsNotesIt = viewsNotes.iterator();
+							while ( viewsNotesIt.hasNext() ) {
+								Notes viewNotesFound = viewsNotesIt.next();
 
 								if ( view.isAnyItemExistsInBothFolders(folderRoot, viewNotesFound.getFolderRoot()) == true ) {
 									isWorkDirectoryPartOpened = true;
@@ -431,7 +431,7 @@ public class JTextNotes {
 
 							if ( isWorkDirectoryPartOpened == false ) {
 								re01.jtextnotes.user.Parameters.setWorkDirectoryLastPath( workDirectoryPath );
-								viewNotes.add( view );
+								viewsNotes.add( view );
 								view.resume();
 
 							} else {
@@ -479,6 +479,8 @@ public class JTextNotes {
 	public static void createViewParameters( Object[] args ) {
 		
 		if ( viewParameters == null ) {
+			Boolean isNotesSaved = isViewsNotesSaved();
+			
 			Object[] argsNew = new Object[]{ MethodHelper.createDefaultArgs() };
 
 			try {
@@ -493,6 +495,10 @@ public class JTextNotes {
 			} catch (Re01JLibException ex) {
 				Core.get_LOGGER().write( ex );
 			}
+			
+			if ( isNotesSaved == false ) {
+				createAlertParametersCanNotChangeUnitlSaveNotes();
+			}
 		} else {
 			viewParameters.resume();
 			viewParameters.requestFocus();
@@ -500,59 +506,84 @@ public class JTextNotes {
 	}
 	
 	public static void validViewParameters( Object[] args ) {
-		boolean isNeedProgramRestartToApplyChanges = false;
+		Boolean isNotesSaved = isViewsNotesSaved();
 		
-		Integer charsBaseSize = null;
-		Integer iconsSize = null;
-		Boolean isViewWelcomeDoNotDisplayAgain = null;
-		Boolean isWorkDirectoryLastAutoSelect = null;
-		Integer documentHistoryLength = null;
-		try {
-			charsBaseSize = MethodHelper.getArgInteger(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_CHARS_BASE_SIZE(), args );
-			iconsSize = MethodHelper.getArgInteger(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_ICONS_SIZE(), args );
-			isViewWelcomeDoNotDisplayAgain = MethodHelper.getArgBoolean(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_IS_VIEW_WELCOME_DO_NOT_DISPLAY_AGAIN(), args );
-			isWorkDirectoryLastAutoSelect = MethodHelper.getArgBoolean(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_IS_WORK_DIRECTORY_LAST_AUTO_SELECT(), args );
-			documentHistoryLength = MethodHelper.getArgInteger(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_DOCUMENT_HISTORY_LENGTH(), args );
-		} catch (Re01JLibException ex) {
-			Core.get_LOGGER().write( ex );
-		}
-		if ( charsBaseSize != null ) {
-			if ( Objects.equals(re01.environment.Parameters.getCharsBaseSize(), charsBaseSize) == false )
-				isNeedProgramRestartToApplyChanges = true;
+		if ( isNotesSaved == false ) {
+			createAlertParametersCanNotChangeUnitlSaveNotes();
+		} else {
+			viewsNotesDeleteNotesPanes();
 			
-			re01.environment.Parameters.setCharsBaseSize( charsBaseSize );
-		}
-		if ( iconsSize != null ) {
-			if ( Objects.equals(re01.environment.Parameters.getIconsSize(), iconsSize) == false )
-				isNeedProgramRestartToApplyChanges = true;
+			Boolean isNeedProgramRestartToApplyChanges = false;
 			
-			re01.environment.Parameters.setIconsSize( iconsSize );
-		}
-		if ( isViewWelcomeDoNotDisplayAgain != null ) {
-			re01.jtextnotes.user.Parameters.setIsViewWelcomeDoNotDisplayAgain( isViewWelcomeDoNotDisplayAgain );
-		}
-		if ( isWorkDirectoryLastAutoSelect != null ) {
-			re01.jtextnotes.user.Parameters.setIsWorkDirectoryLastAutoSelect( isWorkDirectoryLastAutoSelect );
-		}
-		if ( documentHistoryLength != null ) {
-			re01.environment.Parameters.setDocumentHistoryLength( documentHistoryLength );
-		}
-		
-		if ( isNeedProgramRestartToApplyChanges == true ) {
+			Integer charsBaseSize = null;
+			Integer iconsSize = null;
+			Boolean isViewWelcomeDoNotDisplayAgain = null;
+			Boolean isWorkDirectoryLastAutoSelect = null;
+			Integer documentHistoryLength = null;
 			try {
-				Images icons = new Images();
-				LinkedHashMap<ImageIcon, String> messagesMap = new LinkedHashMap<ImageIcon, String>();
-				messagesMap.put( icons.get_GLOBAL_IMAGE_ICON_INFO(), re01.jtextnotes.user.Parameters.getLanguageSelected().get_LANG().get_TEXT_YOU_NEED_TO_RESTART_PROGRAM_TO_APPLY_CHANGES() );
-
-				Object[] argsNew = new Object[]{ MethodHelper.createDefaultArgs() };
-
-				MethodHelper.addOrReplaceCallbackArg( Alert.get_ARG_KEY_ALERT_MESSAGE(), messagesMap, argsNew );
-
-				Alert alert = new Alert( re01.jtextnotes.user.Parameters.getLanguageSelected().get_LANG().get_MESSAGES(), argsNew );
-				alert.resume();
+				charsBaseSize = MethodHelper.getArgInteger(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_CHARS_BASE_SIZE(), args );
+				iconsSize = MethodHelper.getArgInteger(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_ICONS_SIZE(), args );
+				isViewWelcomeDoNotDisplayAgain = MethodHelper.getArgBoolean(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_IS_VIEW_WELCOME_DO_NOT_DISPLAY_AGAIN(), args );
+				isWorkDirectoryLastAutoSelect = MethodHelper.getArgBoolean(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_IS_WORK_DIRECTORY_LAST_AUTO_SELECT(), args );
+				documentHistoryLength = MethodHelper.getArgInteger(re01.jtextnotes.view.Parameters.get_ARG_KEY_PARAMETER_DOCUMENT_HISTORY_LENGTH(), args );
 			} catch (Re01JLibException ex) {
 				Core.get_LOGGER().write( ex );
 			}
+			if ( charsBaseSize != null ) {
+				if ( Objects.equals(re01.environment.Parameters.getCharsBaseSize(), charsBaseSize) == false )
+					isNeedProgramRestartToApplyChanges = true;
+
+				re01.environment.Parameters.setCharsBaseSize( charsBaseSize );
+			}
+			if ( iconsSize != null ) {
+				if ( Objects.equals(re01.environment.Parameters.getIconsSize(), iconsSize) == false )
+					isNeedProgramRestartToApplyChanges = true;
+
+				re01.environment.Parameters.setIconsSize( iconsSize );
+			}
+			if ( isViewWelcomeDoNotDisplayAgain != null ) {
+				re01.jtextnotes.user.Parameters.setIsViewWelcomeDoNotDisplayAgain( isViewWelcomeDoNotDisplayAgain );
+			}
+			if ( isWorkDirectoryLastAutoSelect != null ) {
+				re01.jtextnotes.user.Parameters.setIsWorkDirectoryLastAutoSelect( isWorkDirectoryLastAutoSelect );
+			}
+			if ( documentHistoryLength != null ) {
+				re01.environment.Parameters.setDocumentHistoryLength( documentHistoryLength );
+			}
+
+			if ( isNeedProgramRestartToApplyChanges == true ) {
+				try {
+					Images icons = new Images();
+					LinkedHashMap<ImageIcon, String> messagesMap = new LinkedHashMap<ImageIcon, String>();
+					messagesMap.put( icons.get_GLOBAL_IMAGE_ICON_INFO(), re01.jtextnotes.user.Parameters.getLanguageSelected().get_LANG().get_TEXT_YOU_NEED_TO_RESTART_PROGRAM_TO_APPLY_CHANGES() );
+
+					Object[] argsNew = new Object[]{ MethodHelper.createDefaultArgs() };
+
+					MethodHelper.addOrReplaceCallbackArg( Alert.get_ARG_KEY_ALERT_MESSAGE(), messagesMap, argsNew );
+
+					Alert alert = new Alert( re01.jtextnotes.user.Parameters.getLanguageSelected().get_LANG().get_MESSAGES(), argsNew );
+					alert.resume();
+				} catch (Re01JLibException ex) {
+					Core.get_LOGGER().write( ex );
+				}
+			}
+		}
+	}
+	
+	private static void createAlertParametersCanNotChangeUnitlSaveNotes() {
+		try {
+			Images icons = new Images();
+			LinkedHashMap<ImageIcon, String> messagesMap = new LinkedHashMap<ImageIcon, String>();
+			messagesMap.put( icons.get_GLOBAL_IMAGE_ICON_CAUTION(), re01.jtextnotes.user.Parameters.getLanguageSelected().get_LANG_PROGRAM().get_TEXT_CAN_NOT_APPLY_PARAMETERS_CHANGES_UNTIL_SAVE_NOTES());
+
+			Object[] alertArgsNew = new Object[]{ MethodHelper.createDefaultArgs() };
+
+			MethodHelper.addOrReplaceCallbackArg( Alert.get_ARG_KEY_ALERT_MESSAGE(), messagesMap, alertArgsNew );
+
+			Alert alert = new Alert( re01.jtextnotes.user.Parameters.getLanguageSelected().get_LANG().get_MESSAGES(), alertArgsNew );
+			alert.resume();
+		} catch (Re01JLibException ex) {
+			Core.get_LOGGER().write( ex );
 		}
 	}
 	
@@ -566,19 +597,19 @@ public class JTextNotes {
 	}
 	
 	public static void refreshViewsNotesTree() {
-		Iterator<Notes> notesIt = JTextNotes.viewNotes.iterator();
-		while ( notesIt.hasNext() ) {
-			Notes notesFound = notesIt.next();
-			notesFound.refreshTree();
+		Iterator<Notes> viewsNotesIt = JTextNotes.viewsNotes.iterator();
+		while ( viewsNotesIt.hasNext() ) {
+			Notes viewNotes = viewsNotesIt.next();
+			viewNotes.refreshTree();
 		}
 	}
 	
 	public static boolean isViewsNotesSaved() {
 		boolean isSaved = true;
-		Iterator<Notes> notesIt = JTextNotes.viewNotes.iterator();
-		while ( notesIt.hasNext() ) {
-			Notes notesFound = notesIt.next();
-			isSaved = notesFound.isNotesSaved();
+		Iterator<Notes> viewsNotesIt = JTextNotes.viewsNotes.iterator();
+		while ( viewsNotesIt.hasNext() ) {
+			Notes viewNotes = viewsNotesIt.next();
+			isSaved = viewNotes.isNotesSaved();
 			if ( isSaved == false )
 				break;
 		}
@@ -586,9 +617,9 @@ public class JTextNotes {
 	}
 	
 	public static void viewsNotesDeleteFolder( Notes viewNotes, Folder folder ) {
-		Iterator<Notes> notesIt = JTextNotes.viewNotes.iterator();
-		while ( notesIt.hasNext() ) {
-			Notes viewNotesFound = notesIt.next();
+		Iterator<Notes> viewsNotesIt = JTextNotes.viewsNotes.iterator();
+		while ( viewsNotesIt.hasNext() ) {
+			Notes viewNotesFound = viewsNotesIt.next();
 			if ( viewNotesFound.equals(viewNotes) == true ) {
 				viewNotesFound.deleteFolder( folder );
 				viewNotesFound.deleteNode( folder );
@@ -599,15 +630,24 @@ public class JTextNotes {
 	}
 	
 	public static void viewsNotesDeleteNote( Notes viewNotes, Note note ) {
-		Iterator<Notes> notesIt = JTextNotes.viewNotes.iterator();
-		while ( notesIt.hasNext() ) {
-			Notes viewNotesFound = notesIt.next();
+		Iterator<Notes> viewsNotesIt = JTextNotes.viewsNotes.iterator();
+		while ( viewsNotesIt.hasNext() ) {
+			Notes viewNotesFound = viewsNotesIt.next();
 			if ( viewNotesFound.equals(viewNotes) == true ) {
 				viewNotesFound.deleteNote( note );
 				viewNotesFound.deleteNode( note );
 				break;
 			}
 			viewNotesFound.refreshTree();
+		}
+	}
+	
+	public static void viewsNotesDeleteNotesPanes() {
+		Iterator<Notes> viewsNotesIt = JTextNotes.viewsNotes.iterator();
+		while ( viewsNotesIt.hasNext() ) {
+			Notes viewNotes = viewsNotesIt.next();
+			viewNotes.deleteNotesPanes();
+			viewNotes.closeNoteOpened();
 		}
 	}
 	

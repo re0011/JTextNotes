@@ -35,16 +35,10 @@ public class JTextPane extends re01.design.view.swing.JTextPane {
 	
 	public JTextPane( String text, boolean enableCopyActionWithStyle, boolean enablePasteAction, Object[] callbacksArgs ) throws Re01JLibException {
 		super( text, enableCopyActionWithStyle, enablePasteAction, callbacksArgs );
-		construct();
 	}
 	
 	public JTextPane( String text, Font font, boolean enableCopyActionWithStyle, boolean enablePasteAction, Object[] callbacksArgs ) throws Re01JLibException {
 		super( text, font, enableCopyActionWithStyle, enablePasteAction, callbacksArgs );
-		construct();
-	}
-	
-	private void construct() {
-		
 	}
 
 	public static final String get_ARG_KEY_CALLBACKS_SET_NOTE_OPENED_IS_SAVED() {

@@ -208,6 +208,8 @@ public class French extends Global {
 		WORK_DIRECTORY_CLOSE = "Fermer le " + WORK_DIRECTORY.toLowerCase();
 		WORK_DIRECTORY_PART_OPENED = "Un répertoire de travail déjà ouvert contient tout ou partie du répertoire de travail que vous essayez d'ouvrir.";
 		
+		TEXT_CAN_NOT_APPLY_PARAMETERS_CHANGES_UNTIL_SAVE_NOTES = "Les paramètres ne peuvent pas changer tant que toutes les notes ne sont pas sauvegardées.";
+		
 		//=====================
 		// Languages
 		
